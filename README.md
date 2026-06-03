@@ -12,7 +12,6 @@ and physics integration. Soon to evolve into a full-scale video game.
 ![Team](https://img.shields.io/badge/team-solo-lightgrey)
 ![Genre](https://img.shields.io/badge/genre-survival/horror/roguelike-red)
 
-
 ---
 
 ## Table of Contents
