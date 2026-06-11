@@ -115,6 +115,7 @@ but I also dabble into music production on my side, so I might try to make some 
 | **F5** | Toggle First-person / Third-person camera |
 | **Esc** | Pause / Back in a menu |
 
+
 \
 <img src="demos/month1/slide_jumping_demo.gif" width="90%" alt="Slide Jumping Demo">
 
