@@ -5,12 +5,13 @@ Designed as a foundation for 3D game development with modular architecture
 and physics integration. Soon to evolve into a full-scale video game.
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Version](https://img.shields.io/badge/version-0.4.1-blue)
+![Version](https://img.shields.io/badge/version-0.5.0-blue)
 ![Stage](https://img.shields.io/badge/stage-pre--alpha-orange)
 ![Platform](https://img.shields.io/badge/platform-Windows-informational)
 ![Language](https://img.shields.io/badge/language-C%2B%2B-blue)
 ![Team](https://img.shields.io/badge/team-solo-lightgrey)
 ![Genre](https://img.shields.io/badge/genre-survival/horror/roguelike-red)
+ ![OpenGL](https://img.shields.io/badge/OpenGL-3.3-white)
 
 
 ---
@@ -72,7 +73,7 @@ but I also dabble into music production on my side, so I might try to make some 
 - **OpenGL Rendering**: Modern OpenGL 3.3+ with shader support
 - **Window Management**: Dedicated `Window` class wrapping GLFW — handles
   display modes, cursor, vsync, size limits
-- **Camera System**: FPS freelook and TPS orbit, smooth mouse damping,
+- **Camera System**: FPS freelook and TPS orbit (<u>***third person has been put aside since week 5***</u>)</span>, smooth mouse damping,
   switchable at runtime (F5)
 - **Input Management**: Keyboard and mouse input with proper per-frame
   state tracking (just-pressed, held, released)
@@ -98,8 +99,24 @@ but I also dabble into music production on my side, so I might try to make some 
 - **Vault (quick ledge climbing)**: Proximity and facing detection, choppy and trimmed squat animation
 - **Hard Landing**: Impact velocity detection for big jumps, brief movement loss (might remove)
 
-<img src="demos/slide_jumping_demo.gif" width="90%" alt="Slide Jumping Demo">
 
+### Controls
+
+| Input | Action |
+|-------|--------|
+| **W / A / S / D** | Move forward/left/backward/right |
+| **Space** | Jump (hold for higher jump) / Vault when near object / Get up from crouch & prone |
+| **Left Shift** | Sprint (1.5x speed) |
+| **C** | Crouch (hold C while airborne + land to slide with enough speed) |
+| **Left Ctrl** | Prone |
+| **F** | Toggle modelview flashlight |
+| **Mouse** | Look around (pitch/yaw) |
+| **Right-click** | Aim mode, brings focus to center of screen with a little zoom and reduced speed |
+| **F5** | Toggle First-person / Third-person camera |
+| **Esc** | Pause / Back in a menu |
+
+\
+<img src="demos/month1/slide_jumping_demo.gif" width="90%" alt="Slide Jumping Demo">
 
 ### Animation System
 - **Skeletal Mesh**: Bone-weighted vertex skinning via `skinned.vert`
@@ -111,18 +128,30 @@ but I also dabble into music production on my side, so I might try to make some 
   crouch\_idle, crouch\_walk, vault
 
 PS: HEAVILY RELIES ON FREE MIXAMO ANIMATIONS' BONE STRUCTURES FOR BASIC HUMANOID\
-PPS: probably needs rework
+PPS: **65 bones dependent, but needs new bone naming convention and MAX_BONES update**
 
 ### Graphics
-- **Post-Processing**: FBO-based render pipeline with blur pass
-  (active on pause/settings overlay)
+- **Post-Processing**: HDR FBO pipeline (GL_RGB16F) with blur, SSAO, and bloom passes
 - **Resolution Scaling**: Separate internal render resolution and display
   resolution — works in all window modes (added funny 320×240 res -> beware of windowed low res lol)
 - **Aspect Ratio Correction**: Black bars (letterbox/pillarbox) when render
   ratio doesn't match display ratio — no stretching
 - **Skybox**: Cubemap skybox rendering
-- **Lighting**: Phong lighting with diffuse textures, configurable sun position
+- **Lighting**: Full Phong lighting pipeline — directional sun/moon, multiple point lights, flashlight
+- **Shadow System**: PCF directional shadows (sun + moon), cubemap point light shadows, flashlight spot shadows — all casting from static and skeletal meshes
+- **SSAO**: Screen-space ambient occlusion with quality levels (16/32/64 samples), half-res blur pass
+- **Bloom**: Emissive object bloom via threshold extraction and ping-pong Gaussian blur at half resolution
+- **Day/Night Cycle**: Sun/moon orbit with dynamic light color, intensity, ambient, fog, and campfire scaling
+- **Fog**: Distance-based fog with day/night color blending
+- **Normal Maps, AO Maps, Roughness Maps**: Per-material PBR-adjacent texture support
+- **Sun Glow + Lens Flare**: Post-process screen-space sun glow and flare orbs with depth occlusion
 - **Primitives**: Built-in cube, square, triangle geometry via `Primitives` namespace
+
+### Level & World Systems
+- **JSON Level Loader**: Declarative level files supporting mesh entities, static models, materials, colliders, point lights, and emissive objects
+- **StaticModel**: Multi-submesh model support with per-submesh materials and transparency detection
+- **Procedural Generation**: Seed-based obstacle field spawning with configurable area, safe radius, gap spacing, and scale ranges
+- **Raycasting**: Ray-AABB intersection utility for camera spring arm and future gameplay use
 
 ---
 
@@ -159,11 +188,7 @@ PPS: probably needs rework
 - **Micro-optimizations**: `glm::length2()` for zero-checks, cached
   camera trigonometry
 
-**Testing:**
-- TODO: Add unit tests for physics calculations and input handling
-- TODO: Needs error handling class
-
-<img src="demos/grounded_demo.gif" width="90%" alt="Grounded Demo">
+<img src="demos/month1/grounded_demo.gif" width="90%" alt="Grounded Demo">
 
 ---
 
@@ -178,9 +203,9 @@ Additionally added a GUI system, some settings with basic camera and graphics op
 - Added a simple skybox with a cubemap shader and texture
 - Implemented basic Phong lighting with a directional sun light and diffuse textures
 
-<img src="demos/skybox_demo.gif" width="90%" alt="Skybox Demo">
+<img src="demos/month1/skybox_demo.gif" width="90%" alt="Skybox Demo">
 
-<img src="demos/camera_demo.gif" width="90%" alt="Camera Demo">
+<img src="demos/month1/camera_demo.gif" width="90%" alt="Camera Demo">
 
 #### Extraction & Separation of Concerns
 
@@ -239,8 +264,8 @@ This week was mostly based around an animation loading system. Though i finished
 to player movement mechanics. My friends couldn't see my game through screen share, OBS didn't work either, so I had to
 fix this or else I wouldn't be able to show the atrocities my animation system created.\
 \
-<img src="demos/amalgam1.jpg" width="30%" alt="Skybox Demo">
-<img src="demos/amalgam2.jpg" width="30%" alt="Skybox Demo">
+<img src="demos/month1/amalgam1.jpg" width="30%" alt="Skybox Demo">
+<img src="demos/month1/amalgam2.jpg" width="30%" alt="Skybox Demo">
 \
 \
 I heavily relied on Mixamo for free animations, only problem being the vertical movement for jumping or climbing... BUT IT WILL DO...
@@ -291,7 +316,7 @@ Player animation is driven by state flags read from `PhysicsComponent` and
 | Running | `run` | Speed scaled to move speed |
 | Idle | `idle` | — |
 
-<img src="demos/basic_control_demo.gif" width="90%" alt="Basic Control Demo">
+<img src="demos/month1/basic_control_demo.gif" width="90%" alt="Basic Control Demo">
 
 #### Player Mechanics (Beginning)
 
@@ -318,7 +343,85 @@ Player animation is driven by state flags read from `PhysicsComponent` and
   resolution, not render resolution
 - **7 resolutions**: Added 320×240 (4:3 retro)
 
-<img src="demos/low_res_demo.gif" width="90%" alt="Low Res Vault and Landing Demo">
+<img src="demos/month1/low_res_demo.gif" width="90%" alt="Low Res Vault and Landing Demo">
+
+#### Level System, Procedural Generation & Static Models
+
+Added foundational world-building systems alongside the animation work:
+
+- **JSON Level Loader**: Declarative level files via `LevelLoader` — mesh entities and static models with full material overrides (diffuse, normal, AO, roughness, color, tiling, shininess, specular), collider types, static flags, camera blocker/vaultable tags, point light attachment, and emissive object support
+- **Procedural Generator**: `ProceduralGenerator::generateObstacleField()` — Poisson-disk-style placement with minimum gap enforcement, safe zone around spawn, three obstacle types (platforms, boxes, pillars) with randomized scale ranges, reproducible via seed or random each run
+
+---
+
+### Week 5: Full Lighting Overhaul
+
+Considering my engine barely had any lighting structure, I had to make some improvements for the horror-style visuals. I want my graphics
+implementations to be configurable by settings as much as possible, in case someone with a lower-end computer can still enjoy the game !
+
+#### Shadow System
+
+- **Directional shadows** (sun + moon): orthographic shadow maps with PCF filtering (1/4/9 samples by quality), slope-based bias, resolution-aware bias scaling, and `glPolygonOffset` for depth precision
+- **Cubemap point light shadows**: depth cubemap rendered in a single geometry shader pass across all 6 faces, linear world-space depth, 20-sample PCF with variable disk radius, slope-cosTheta bias capped at 0.12
+- **Flashlight spot shadow**: perspective shadow map with PCF, frustum bounds check
+- All three shadow types cast correctly from **static meshes, StaticModel submeshes, and skeletal meshes**
+- Transparent submeshes and emissive objects skip shadow casting and receiving
+- Distance culling for cubemap shadow pass
+
+<img src="demos/month2/lantern_shadow_demo.gif" width="50%" alt="Flashlight mesh shadows demo"><img src="demos/month2/low_res_flashlight_demo.gif" width="50%" alt="Low res flashlight demo">
+
+#### Day/Night Cycle
+
+- Sun orbits in a tilted east-west plane with a slight north-south offset — never directly overhead
+- Dynamic light color: warm white at zenith, pink-red sunrise, deep orange sunset
+- `sunIntensity` drives ambient, fog density, fog color, shadow weights, and campfire fire strength simultaneously
+- Moon takes over seamlessly at night with cooler blue-tinted lighting
+- Campfire flicker scales down to near-zero during full daylight
+
+<img src="demos/month2/sunset_demo.gif" width="50%" alt="Sunset demo"><img src="demos/month2/sunrise_demo.gif" width="50%" alt="Sunrise demo">
+
+#### SSAO
+
+- Screen-space ambient occlusion with hemisphere sample kernel
+- Quality levels: Low (16 samples), Medium (32), High (64)
+- Half-resolution blur pass, composited in post with configurable strength
+- Skips viewmodel (depth threshold guard)
+
+<img src="demos/month2/settings_menu_demo.png" width="50%" alt="Settings menu demo"><img src="demos/month2/mud_material_demo.png" width="50%" alt="Mud material demo">
+
+#### Bloom
+
+- Emissive objects (campfire, lightbulbs) now glow in world space
+- Brightness threshold extraction pass on the HDR framebuffer
+- Ping-pong Gaussian blur at half resolution (4 passes)
+- Additive composite in the final blit shader
+- Toggle in settings UI
+
+#### Additional Lighting Features
+
+- **Multiple point lights** (up to 8) with per-light color and radius falloff
+- **Hemisphere ambient**: sky color / ground color gradient based on surface normal direction
+- **Normal maps, AO maps, roughness maps**: full per-material PBR-adjacent texture support in both basic and skinned shaders
+- **Fog**: distance-based exponential fog with full day/night color blending
+- **Sun glow + lens flare**: screen-space glow, halo, and 5-orb lens flare with depth occlusion test
+- **Shader uniform location caching**: `Shader::loc()` caches `glGetUniformLocation` results in an unordered_map — eliminates repeated driver calls
+
+<img src="demos/month2/campfire_shadow_demo.gif" width="50%" alt="Campfire point light"><img src="demos/month2/glare_demo.gif" width="50%" alt="Lens flare demo">
+
+#### Render Refactor
+
+- Extracted all per-frame lighting math into `computeSceneUniforms()` — computed once, stored in `SceneUniforms` struct
+- `bindLightingUniforms(shader, uniforms, viewPos)` applies all lighting, fog, shadow, and point light uniforms to any shader in one call
+- Eliminated ~150 lines of copy-pasted uniform uploads that were duplicated between the basic and skinned shader passes
+- `GameScene::render()` reduced from ~320 lines to ~65
+
+#### Bug Fixes & Quality
+
+- **StaticModel**: Multi-submesh model support with per-submesh materials and automatic transparency detection (`opacity < 0.99` or name implies glass) — transparent submeshes skip shadow casting and receive alpha blending separately
+- `GL_TEXTURE_CUBE_MAP_SEAMLESS` + `GL_NEAREST` to eliminate cubemap face seam artifacts
+- Resolution-aware shadow bias (`texelScale = 2048 / shadowMapSize`) prevents false darkening at low shadow quality settings
+- Shadow frustum tightened per quality level for better detail on small geometry
+- `SkeletalMeshComponent::animator` converted from raw pointer to `std::unique_ptr` — fixed animator memory leak on entity destruction
 
 ---
 
@@ -394,10 +497,19 @@ Player animation is driven by state flags read from `PhysicsComponent` and
 │   │   └── player_system.cpp
 │   └── main.cpp
 ├── shaders/
-│   ├── basic.vert / basic.frag     # Phong lighting shader
-│   ├── skinned.vert / skinned.frag # Bone-weighted skeletal shader
+│   ├── basic.vert / basic.frag              # Phong lighting shader with full shadow/SSAO/bloom support
+│   ├── skinned.vert / skinned.frag          # Bone-weighted skeletal shader (same lighting as basic)
 │   ├── skybox.vert / skybox.frag
-│   └── blur.vert / blur.frag       # Post-process blur
+│   ├── blur.vert / blur.frag                # Post-process: blur, SSAO composite, sun glow, lens flare, bloom composite
+│   ├── shadow.vert / shadow.frag            # Directional shadow map pass
+│   ├── shadow_skinned.vert                  # Directional shadow pass for skeletal meshes
+│   ├── point_shadow.vert / .geom / .frag    # Cubemap point light shadow pass (geometry shader)
+│   ├── point_shadow_skinned.vert            # Cubemap shadow pass for skeletal meshes
+│   ├── ssao.vert / ssao.frag                # SSAO occlusion pass
+│   ├── ssao_blur.frag                       # SSAO blur pass
+│   ├── bloom_threshold.frag                 # Bloom brightness extraction
+│   ├── bloom_blur.frag                      # Bloom Gaussian blur (ping-pong)
+│   └── emissive.vert / emissive.frag        # Emissive-only unlit shader
 ├── assets/
 │   ├── animations/                 # FBX files (Ninja model + clips)
 │   ├── textures/
@@ -451,6 +563,8 @@ or build from source. Add include/lib paths and link `assimp-vc143-mt.lib`.
 | **stb_image** | `libs/stb_image.h` | Texture loading (PNG, JPG, etc.) |
 | **miniaudio** | `libs/miniaudio.h` | Audio playback (single-header) |
 
+PS: ***tinyobjloader*** is not necessary anymore and has been removed from external libraries during week 5.
+
 These are already part of the repository — just build and go.  
 For GLAD specifically, make sure `glad.c` is included as a source file in
 your project.
@@ -464,21 +578,6 @@ cd GLFW_GAME
 # Build > Build Solution (Ctrl+Shift+B)
 # Debug > Start Debugging (F5)
 ```
-
-## Usage
-
-### Controls
-
-| Input | Action |
-|-------|--------|
-| **W / A / S / D** | Move forward/left/backward/right |
-| **Space** | Jump (hold for higher jump) / Vault when near object / Get up from crouch & prone |
-| **Left Shift** | Sprint (1.5x speed) |
-| **C** | Crouch (hold C while airborne + land to slide with enough speed) |
-| **Left Ctrl** | Prone |
-| **Mouse** | Look around (pitch/yaw) |
-| **F5** | Toggle First-person / Third-person camera |
-| **Esc** | Pause / Back in a menu |
 
 ---
 
@@ -526,12 +625,17 @@ in static typed maps, provides `view<T>()` queries.
 
 ### Rendering Pipeline
 
-1. `PostProcess::bindForRender()` — bind FBO, set render viewport
-2. `GameScene::render()` — set light uniforms, call `RenderSystem` (static meshes)
-3. `RenderSystem` — iterate world entities, call `Renderer` per entity
-4. Skeletal mesh pass — iterate `SkeletalMeshComponent` entities, upload bone matrices, draw
-5. Skybox pass
-6. `PostProcess::blit()` — unbind FBO, calculate aspect-ratio viewport, run blur shader, draw quad
+1. `PostProcess::bindForRender()` — bind HDR FBO (GL_RGB16F), set render viewport
+2. Shadow passes — sun/moon directional, cubemap point light, flashlight spot (distance-culled)
+3. `computeSceneUniforms()` — compute all lighting/fog/shadow values once for the frame
+4. `bindLightingUniforms()` — upload all uniforms to a shader in one call (used for both static and skeletal shaders)
+5. Opaque static pass — `RenderSystem::renderOpaque()` iterates world entities
+6. Opaque skeletal pass — iterate `SkeletalMeshComponent` entities, upload bone matrices, draw
+7. SSAO pass — occlusion + blur, composited in blit
+8. Transparent pass — static + skeletal transparent submeshes with depth write disabled
+9. Skybox pass
+10. Bloom pass — threshold extraction, ping-pong Gaussian blur at half-res
+11. `PostProcess::blit()` — aspect-ratio viewport, composite SSAO + bloom, sun glow, lens flare
 
 ---
 
@@ -560,32 +664,80 @@ git config --global core.autocrlf true
 ## Roadmap
 
 ### Done
-- Core rendering pipeline (meshes, shaders, lighting)
-- FPS and TPS cameras with spring arm
+
+<details>
+<summary><strong>Engine & Architecture</strong></summary>
+
+- Full ECS architecture (World, components, systems)
+- AssetManager, Window class, UIManager, PostProcess
+- Persistent settings (INI) with `applySettings()` as single source of truth
+- ImGui menus (main menu, pause, settings)
+- Scene management with lifecycle hooks
+- `computeSceneUniforms()` + `bindLightingUniforms()` render refactor
+- Shader uniform location caching (`Shader::loc()`)
+- JSON level loader with full material, collider, and light support
+
+</details>
+
+<details>
+<summary><strong>Player & Physics</strong></summary>
+
 - Player physics and movement (ECS-based)
 - AABB collision detection and resolution
-- Post-processing FBO with blur
-- Full ECS architecture (World, components, systems)
-- Persistent settings (INI)
-- ImGui menus (main menu, pause, settings)
-- Borderless fullscreen + resolution scaling
-- AssetManager, Window class, UIManager, PostProcess
+- Ray-AABB intersection utility
+- FPS and TPS cameras with spring arm
+- FPS/TPS mode-aware movement and mesh rotation
 - Crouch, prone, slide, vault player mechanics
+- Hard landing detection and movement lock
+
+</details>
+
+<details>
+<summary><strong>Graphics & Rendering</strong></summary>
+
+- Core rendering pipeline (meshes, shaders, lighting)
+- Post-processing HDR FBO pipeline (GL_RGB16F)
+- Borderless fullscreen + resolution scaling
+- Aspect ratio-correct blit with black bars
+- Full shadow pipeline: directional PCF + cubemap point light + flashlight spot
+- Shadows from static meshes, StaticModel submeshes, and skeletal meshes
+- SSAO with quality levels and blur pass
+- Bloom via threshold extraction and ping-pong Gaussian blur
+- Day/night cycle with dynamic sun/moon color, ambient, fog, and campfire scaling
+- Hemisphere ambient (sky/ground color gradient)
+- Normal maps, AO maps, roughness maps per material
+- Multiple point lights (up to 8)
+- Fog with day/night blending
+- Sun glow + lens flare with depth occlusion
+
+</details>
+
+<details>
+<summary><strong>Animation</strong></summary>
+
 - Full skeletal animation system with crossfade blending
 - Animation state machine (idle, run, jump, fall, land, vault, slide, prone, crouch)
-- FPS/TPS mode-aware movement and mesh rotation
-- Hard landing detection and movement lock
-- Aspect ratio-correct blit with black bars
-- `applySettings()` as single source of truth for display changes
+- Fixed animator memory leak (`unique_ptr<Animator>`)
+
+</details>
+
+<details>
+<summary><strong>Level & World</strong></summary>
+
+- StaticModel multi-submesh system with transparency detection
+- Procedural obstacle field generation with seed and gap spacing
+
+</details>
 
 ### Upcoming
+- [ ] ECS rework: broader multi-component queries, spatial index for physics broad-phase
 - [ ] Website and documentation setup through NameCheap hosting
-- [ ] More scene content / level design (new meshes)
-- [ ] Additional post-process effects (lighting fixes)
 - [ ] Proper error/logging system
 - [ ] Unit tests
-- [ ] Strafe animations (left/right)
-- [ ] Idle-to-crouch / Idle-to-prone transition animation
+- [ ] AI system: enemy behavior, pathfinding, line-of-sight
+- [ ] Health and damage system
+- [ ] Inventory and item pickup
+- [ ] Save / load system
 
 ---
 
@@ -597,9 +749,8 @@ git config --global core.autocrlf true
 ## Contact and Support
 
 - **GitHub**: [TomBlob](https://github.com/TomBlob)
-- **Repository**: [GLFW_GAME](https://github.com/TomBlob/GLFW_GAME)
 - **Email**: Please send any inquiries or feedback to [tom@tomblob.dev](mailto:tom@tomblob.dev)
 
 ---
 
-**Last Updated**: May 31st 2026 | **Current Version**: 0.4.1 (Week 4 — Animation System, Player Polish, and Display Improvements)
+**Last Updated**: June 10th 2026 | **Current Version**: 0.5.0 (Week 5 — Full Lighting Overhaul)
